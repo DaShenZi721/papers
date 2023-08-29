@@ -1,0 +1,77 @@
+\section{Proposed Sliceformer}\label{sec:model}
+\subsection{The Design Principle Guided by Two Hypotheses}
+Typically, given an input $\bm{X}\in\mathbb{R}^{N\times d}$, where $N$ indicates the length of a sequence or the size of a sample set and $d$ is the input feature dimension, an attention layer first obtains the value, query, and key matrices by linear maps, i.e., $\bm{V}=\bm{X}\bm{W}_V\in\mathbb{R}^{N\times D}$, $\bm{Q}=\bm{X}\bm{W}_Q\in\mathbb{R}^{N\times D}$, and $\bm{K}=\bm{X}\bm{W}_K\in\mathbb{R}^{N\times D}$, and then projects $\bm{V}$ as follows:
+\begin{eqnarray}\label{eq:att}
+\begin{aligned}
+    \text{Attention}(\bm{V};\bm{Q},\bm{K}):=\bm{P}(\bm{Q},\bm{K})\bm{V}.
+\end{aligned}
+\end{eqnarray}
+Here, we take $\bm{V}$ as the input of the layer, and $\bm{P}(\bm{Q},\bm{K})\in\mathbb{R}^{N\times N}$ is the attention map parametrized by $\bm{Q}$ and $\bm{K}$, which can be implemented by various models (e.g., those shown in Table~\ref{tab:cmp}). 
+The multi-head attention layer applies a group of linear maps, i.e., $\theta=\{\bm{W}_{V,m},\bm{W}_{Q,m},\bm{W}_{K,m}\in\mathbb{R}^{d\times D}\}_{m=1}^{M}$, to construct $M$ attention layers and concatenates their outputs, i.e.,
+\begin{eqnarray}\label{eq:mha}
+\begin{aligned}
+    &\text{MHA}_{\theta}(\bm{X}) := \text{Concat}_{\text{row}}(\{\text{Attention}(\bm{V}_m;\bm{Q}_m,\bm{K}_m)\}_{m=1}^{M})\in\mathbb{R}^{N\times MD},\\
+    &\text{where}~\bm{V}_m=\bm{X}\bm{W}_{V,m},~\bm{Q}_m=\bm{X}\bm{W}_{Q,m},~\text{and}~\bm{K}_m=\bm{X}\bm{W}_{K,m},~\forall m=1,...,M.
+\end{aligned}
+\end{eqnarray}
+In this study, we analyze the architectures of the above multi-head attention layer used in different models and propose the following two hypotheses to guide our model design. 
+
+Firstly, as Figure~\ref{fig:cmp}, the following experiments, and the results in~\cite{beltagy2020longformer,gu2021efficiently,zhen2022cosformer,ma2022mega} show, the models applying sparse attention maps, e.g., CosFormer and Longformer, can achieve competitive performance and higher efficiency than the vanilla Transformer. 
+On the contrary, although imposing low-rank structures on the attention maps can also reduce the computational complexity, it seems to harm the performance --- the gaps between the vanilla Transformer and the models using low-rank attention maps are significant on the LRA benchmark. 
+In our opinion, a potential reason for this phenomenon is that when $\text{rank}(\bm{P})\ll N$, the rank of the output embeddings $\text{MHA}_{\theta}(\bm{X})$ is likely to be smaller than $N$. 
+Such linear dependency may limit the representation power of the output embeddings.
+In addition, the work in~\cite{sander2022sinkformers} shows that in various discriminative learning tasks, the attention maps tend to be doubly stochastic (i.e., $\bm{P}\bm{1}_N=\bm{1}_N$ and $\bm{P}^{\top}\bm{1}_N=\bm{1}_N$) during training. 
+Accordingly, the Sinkformer designs the attention maps based on the Sinkhorn-Knopp algorithm~\cite{sinkhorn1967concerning} and makes them doubly stochastic strictly, achieving better performance than the vanilla Transformer. 
+Based on the above analysis, we propose a hypothesis on the desired structure of attention map as follows:
+\begin{hypothesis}\label{hypo:1}
+A desired attention map $\bm{P}$ should be full-rank, sparse, doubly stochastic, and applicable for the backpropagation.
+\end{hypothesis}
+Note that we do not restrict the desired attention map to be parametric. 
+In other words, the query and key matrices might be unnecessary as long as the attention map has the desired structure and can be updated during training. 
+Additionally, Hypothesis~\ref{hypo:1} challenges the rationality of the softmax operation commonly used in many Transformer models. 
+Without any additional data preprocessing like LSH~\cite{kitaev2020reformer} or sliding windows~\cite{beltagy2020longformer,child2019generating}, the softmax operation always provides us with dense attention maps, which disobeys the hypothesis. 
+What is worse, with the increase of data length $N$, the softmax operation often leads to over-smoothed normalization results and suffers from numerical instability issues.\footnote{Take the softmax function in PyTorch as an example. 
+Through analytic experiments, we find that while the softmax operation should be permutation-equivariant, i.e., $\text{Softmax}_{\sigma}(\bm{x})=\text{Softmax}(\bm{x}_{\sigma})$ for an arbitrary vector $\bm{x}$ and an index permutation $\sigma$, such a fundamental property cannot be held in practice. 
+The design of the experiment is given in Appendix~\ref{app:numerical}.}
+In summary, Hypothesis~\ref{hypo:1} is not only about the desired structure of the attention map, but it also provides us with some guidance on our model design --- the parameterization of the attention map might be unnecessary, and the usage of softmax should be avoided. 
+
+The second hypothesis is about the necessity of the multi-head architecture. 
+On the one hand, the multi-head attention layer projects the input to different latent spaces and applies one attention map to each value matrix, as shown in~\eqref{eq:mha}. 
+This multi-head architecture can increase the model capacity greatly~\cite{vaswani2017attention}, which embeds the input from different views. 
+On the other hand, in~\eqref{eq:att}, the features within a value matrix, i.e., the columns of $\bm{V}$, share the same attention map $\bm{P}$, such that we only need to compute one attention map for $D$ features. 
+The above observations reveal that the multi-head attention balances model capacity and computational complexity. 
+In particular, given $MD$ features $\{\bm{V}_m\in\mathbb{R}^{N\times D}\}_{m=1}^{M}$, computing a specialized attention map for each feature can maximize the model capacity but leads to high computational complexity.
+On the contrary, computing one attention map shared by all the features can minimize the complexity but limits the model capacity at the same time.
+The solution of the multi-head attention layer is to group the features by $M$ heads and let the features in the same head share the same attention map. 
+Based on the analysis above, we propose the following hypothesis: 
+\begin{hypothesis}\label{hypo:2}
+The multi-head architecture aims to achieve a trade-off between model capacity and computational complexity. 
+It might be unnecessary if we can find a surrogate that simultaneously has high capacity and low complexity.
+\end{hypothesis}
+The second sentence in Hypothesis~\ref{hypo:2} indicates the motivation of our model design --- if we can compute a specialized attention map for each feature with low computational cost, such an operation might be comparable, even superior, to the current MHA mechanism.
+
+
+\subsection{Slicing-sorting and Its Advantages}
+The above two hypotheses motivate us to design the proposed slicing-sorting operation and accordingly, the Sliceformer. 
+As shown in Table~\ref{tab:cmp}, our slice-sorting operation is extremely simple: projecting the input linearly to a latent space and sorting each feature, i.e.,
+\begin{eqnarray}\label{eq:ss}
+\begin{aligned}
+    \text{SliceSort}(\bm{X}) := \text{Sort}_{\text{col}}(\underbrace{\bm{X}\bm{W}_V}_{\bm{V}}) = \text{Concat}_{\text{row}}(\{\bm{P}_i\bm{v}_i\}_{i=1}^{MD}) \in\mathbb{R}^{N\times MD},
+\end{aligned}
+\end{eqnarray}
+where $\bm{W}_V\in\mathbb{R}^{d\times MD}$ is the projection matrix,\footnote{Here, we set the number of columns in $\bm{W}_V$ to be $MD$, such that the output has the same shape with the output of MHA.} and $\bm{V}=\bm{XW}_V$. 
+Here, we call each column of $\bm{V}$ a ``slice'', denoted as $\bm{v}_i$ for $i=1,...,MD$. 
+Each slice corresponds to the projection result of $N$ $d$-dimensional samples in a 1D space. 
+As shown in~\eqref{eq:ss}, sorting a slice $\bm{v}_i$ corresponds to the multiplication between a permutation matrix $\bm{P}_i$ and the slice, and accordingly, our slicing-sorting operation concatenates all sorted slices as the output.  
+
+
+\xu{Stop here.}
+
+Why not use identity matrix: satisfy H1 but disobey H2.
+
+Add a table to compare different maps under H1+H2.
+
+\xu{Explain how to deal with position embedding.}
+
+To overcome the drawbacks of softmax, existing Transformer models either reduce the size $N$~\cite{kitaev2020reformer,beltagy2020longformer,child2019generating} or apply other operations~\cite{tsai2019transformer,zhen2022cosformer}. 
+However, reducing the size $N$ limits the representation power of the models for long sequence, and the other operations may not generate full-rank and doubly-stochastic attention maps.

@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{algorithm,algpseudocode}
+
+\title{Continuous-Time Recommendation Based on Reinforcement Learning}
+\author{Shen Yuan}
+\date{January 2021}
+\newgeometry{left = 1in, top=1in}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Problem Statement}
+Let $\mathcal{U}$ be the set of users and $\mathcal{I}$ be the set of items. For each user $u$, $\mathcal{S}^u=\left\{(i_k, t_k^u)\right\}_{k=1}^{K}$ denotes a sequence of interactions. It represents that user $u$ interacts with item $i_k$ at time $t_k^u$. Given a sequence of interactions $\mathcal{S}^u$, the problem of continuous-time recommendation is to predict the item that user $u$ will interact with next time.
+
+\section{Basic Models}
+By taking user preferences, the relation between the semantic topics of items and temporal evolution into account, I design the intensity function as
+
+\begin{align}
+\lambda_i^u(t) = \begin{matrix} \sum_{t_k<t} \boldsymbol{\Phi}_{ii_k}^u(t, t_k)  + \alpha\boldsymbol{W}{_u^\mathrm{T}} \sum_{u_k \in \boldsymbol{F}(u, K)} \boldsymbol{W}{_{u_k}} \lambda_i^{u_k}(t) \end{matrix}
+\end{align} 
+
+\begin{align}
+\boldsymbol{\Phi}_{ii_k}^u(t, t_k) = \mathrm{exp}(-\omega(t-t_k))  (( \boldsymbol{W}{_u^\mathrm{T}} \cdot \boldsymbol{V}{_{i}})+( \boldsymbol{V}{_i^\mathrm{T}} \cdot \boldsymbol{V}{_{i_k}}))
+\end{align} 
+
+
+where $\alpha$ is a hyperparameter, $\boldsymbol{F}(u, K)$ contains K users whose interests are closest to user u, $\boldsymbol{W}{_u^\mathrm{T}} \cdot \boldsymbol{W}{_{u_k}}$ denotes the similarity between each interests. Equation (2) represents the impact of that user $u$ interacts with item $i_k$ at time $t_k$ on user preference for item $i$ at time $t$. In this equation $\boldsymbol{W}_i, \boldsymbol{V}_i$ are the N-dimensional embedding vectors mapping from high-dimensional feature space into the low-dimensional latent feature space. Hence, $\boldsymbol{W}{_u^\mathrm{T}} \cdot \boldsymbol{V}{_{i_k}} $ denotes how user $u$ like item $i_k$ and $\boldsymbol{V}{_i^\mathrm{T}} \cdot \boldsymbol{V}{_{i_k}}$ denotes the similarity between item $i$ and $i_k$. 
+
+
+\section{Objective Function}
+Given the sequence $\left\{(i_k, t_k^u)\right\}_{k=1}^{K}$, I formulate the objective function as 
+\begin{align}
+\min \begin{matrix} -\sum_{s \in \mathcal{S}}  \log \mathcal{L} (s; \left\{\lambda_i^u \right\}_{i=1}^{|\mathcal{I}|}) \end{matrix}
+\end{align} 
+where $\mathcal{L}$ denotes maximum likelihood function.
+
+\section{Learning Algorithm}
+
+\begin{algorithm}[t]
+\caption{Finding neighbors with the most similar interests} 
+\hspace*{0.02in} {\bf Input:}
+$\left\{ \lambda^u \right\}_{u \in \mathcal{U}} , K, \epsilon, \delta$\\
+\hspace*{0.02in} {\bf Output:} 
+$\left\{ \boldsymbol{F}(u, K) \right\}_{u \in \mathcal{U}}$
+\begin{algorithmic}[1]
+\State 
+\For{$u \in \mathcal{U}$} 
+    \State 
+    \If{condition}
+        \State ...
+    \Else
+        \State ...
+    \EndIf
+\EndFor
+\While{condition}
+    \State ...
+\EndWhile
+\State \Return $\left\{ \boldsymbol{F}(u, K) \right\}_{u \in \mathcal{U}}$
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+\end{document}

@@ -1,0 +1,140 @@
+\documentclass{article}
+
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2023
+\PassOptionsToPackage{numbers, compress}{natbib}
+
+% ready for submission
+\usepackage{neurips_2023}
+
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2023}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%     \usepackage[final]{neurips_2023}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2023}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+
+\usepackage{algorithmic,algorithm}
+\usepackage{amsmath}
+\usepackage{amsopn}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{color}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{multirow}
+% \usepackage{natbib}
+\usepackage{siunitx}
+\usepackage{stfloats}
+\usepackage{subfigure}
+\usepackage{thmtools,thm-restate}
+\usepackage{threeparttable}
+\usepackage{verbatim}
+\usepackage{wrapfig}
+\usepackage{bbding}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{condition}{Condition}
+\newtheorem{hypothesis}{Hypothesis}
+
+\newcommand{\xu}[1]{{\color{red} xu: #1}}
+\newcommand{\yuan}[1]{{\color{blue} yuan: #1}}
+
+\title{From Transformer to Sliceformer: \\Make Multi-Head Attention as Simple as Sorting}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+
+\author{Shen Yuan$^{1*}$\quad Hongteng Xu$^{1,2}$\thanks{The two authors have equal contributions. Hongteng Xu is the corresponding author.} \\
+$^1$Gaoling School of Artificial Intelligence, Renmin University of China\\
+$^2$Beijing Key Laboratory of Big Data Management and Analysis Methods\\
+\texttt{shenyuan@ruc.edu.cn}\quad \texttt{hongtengxu@ruc.edu.cn}\\
+  % examples of more authors
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \AND
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+  % \And
+  % Coauthor \\
+  % Affiliation \\
+  % Address \\
+  % \texttt{email} \\
+}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\begin{document}
+
+\maketitle
+
+\input{sections-NeurIPS/abstract}
+
+\input{sections-NeurIPS/intro}
+
+\input{sections-NeurIPS/related}
+
+\input{sections-NeurIPS/method}
+
+\input{sections-NeurIPS/exp}
+
+\section{Conclusion and Future Work}
+We have proposed a new data representation model called Sliceformer. 
+By replacing the traditional MHA mechanism with a simple slicing-sorting operation, our Sliceformer overcomes the numerical drawbacks of the current Transformers and achieves encouraging performance in various discriminative tasks. 
+\textbf{Our work provides a new perspective to the design of the attention layer, i.e., implementing attention maps through simple algorithmic operations has the potential to achieve high model capacity, low computational complexity, and good numerical performance.} 
+
+\textbf{Limitations and Future Work.} 
+Currently, the rationality of the proposed model is based on the proposed hypotheses and empirical experiments, and its performance in generative learning tasks is not investigated yet.
+Therefore, we would like to find theoretical support for our model and test it in generative learning tasks in the future.
+Additionally, beyond the slicing-sorting operation, we plan to develop other better-performing attention layers and apply them to the models for structured data like point clouds and meshes.
+
+
+\bibliography{refs}
+\bibliographystyle{unsrtnat}
+
+\end{document}

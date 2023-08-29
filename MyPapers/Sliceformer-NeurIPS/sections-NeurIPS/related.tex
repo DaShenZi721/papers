@@ -1,0 +1,21 @@
+\section{Related Work}\label{sec:related}
+Transformer~\cite{vaswani2017attention} is a powerful sequential model friendly to parallel computing. 
+Since it was proposed, Transformer has become the critical module of many large language models, e.g., BERT~\cite{devlin2019bert}, Transformer-XL~\cite{dai2019transformer}, and GPT~\cite{brown2020language}. 
+Besides texts, Transformer is also applied to other sequences, e.g., the Music Transformer~\cite{huang2018music} for music modeling, the Informer~\cite{zhang2021informer} for time series broadcasting and the Transformer Hawkes process~\cite{zuo2020transformer} for event sequence prediction. 
+For non-sequential data like images, the Vision Transformer (ViT)~\cite{dosovitskiy2021an} and its variants~\cite{liu2021swin,chen2021visformer} take the patches of images as a sequence and extract image representations accordingly, which outperform convolutional neural networks (CNNs) in image classification.
+Nowadays, Transformer is being introduced for structured data modeling, e.g., the Graphormer~\cite{ying2021transformers} for molecules, the Set-Transformer~\cite{lee2019set} for point clouds, and the Mesh Transformer~\cite{lin2021mesh} for 3D meshes. 
+The more applications the Transformer has, the more significant it is to study its architecture, especially its MHA mechanism. 
+
+It has been known that the classic MHA mechanism suffers from high computational complexity, poor scalability, and numerical instability for long sequences. 
+As shown in Table~\ref{tab:cmp}, many efforts have been made to overcome these issues. 
+The SparseTrans in~\cite{child2019generating} and the Longformer in~\cite{beltagy2020longformer} compute local attention maps based on the sub-sequences extracted by sliding windows, which leads to sparse global attention maps.
+Some other models sparsify the key and query matrices directly by the locality-sensitive hashing (LSH)~\cite{kitaev2020reformer} or the ReLU operation~\cite{zhen2022cosformer}. 
+Besides pursuing sparse attention maps, another technical route is constructing low-rank attention maps. 
+The Performer~\cite{choromanski2021rethinking} reduces the feature dimension (the column number) of the query and key matrices, while the Linformer~\cite{wang2020linformer} reduces the sample dimension (the row number) of the key and value matrices. 
+
+In addition to simplifying the computation of the attention maps, some work provides new understandings of the attention mechanism. 
+The work in~\cite{tsai2019transformer} treats the attention map as a normalized linear kernel and revisits the vanilla Transformer through different kernels.
+The Performer~\cite{choromanski2021rethinking} and the CosFormer~\cite{zhen2022cosformer} introduce additional mappings for the query and key matrices and consider their linear kernels in the latent spaces.
+Recently, the work~\cite{sander2022sinkformers} reports an interesting phenomenon that the attention map tends to be doubly stochastic during training. 
+Accordingly, it implements the attention map as an optimal transport through the Sinkhorn-Knopp algorithm~\cite{sinkhorn1967concerning}. 
+Note that although providing these new understandings, these Transformer variants fail to design new model architectures that overcome the MHA's issues.

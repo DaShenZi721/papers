@@ -1,0 +1,9 @@
+\begin{abstract}
+As one of the most popular neural network modules, Transformer plays a central role in many fundamental deep learning models, e.g., the ViT in computer vision and the BERT and GPT in natural language processing.
+Although without strict theoretical supports, the effectiveness of the Transformer is often attributed to its multi-head attention (MHA) mechanism. 
+In this study, we challenge this empirical opinion and discuss the limitations of the MHA mechanism, including the numerical issues caused by its softmax operation and the restricted capacity caused by the multi-head architecture. 
+Considering the above issues and the recent development tendency of the attention layer, we propose an effective and efficient surrogate of the Transformer, called Sliceformer. 
+Our Sliceformer replaces the MHA mechanism with an extremely simple ``slicing-sorting'' operation, i.e., projecting inputs linearly to a latent space and sorting them along different feature dimensions. 
+We analyze the connections and differences between the proposed operation and the MHA mechanism and demonstrate the advantages of the corresponding Sliceformer on computational complexity, scalability, and numerical stability.
+Experiments in the Long-Range Arena benchmark, image classification, and molecular analysis show that our Sliceformer achieves comparable or better accuracy with lower memory cost, faster speed, and better numerical stability than the Transformer and its variants. 
+\end{abstract}

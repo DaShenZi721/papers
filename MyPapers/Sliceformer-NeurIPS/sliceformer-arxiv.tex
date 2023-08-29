@@ -1,0 +1,104 @@
+\documentclass[letterpaper,11pt]{article}
+% \documentclass{article} % For LaTeX2e
+% \usepackage{iclr2023_conference,times}
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\usepackage[margin=1in,letterpaper]{geometry} % decreases margins
+% \usepackage{times}
+\input{math_commands.tex}
+
+\usepackage{algorithmic,algorithm}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsopn}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{color}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{multirow}
+% \usepackage{natbib}
+\usepackage{siunitx}
+\usepackage{stfloats}
+\usepackage{subfigure}
+\usepackage{thmtools,thm-restate}
+\usepackage{threeparttable}
+\usepackage{verbatim}
+\usepackage{wrapfig}
+\usepackage{url}
+\usepackage{bbding}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{condition}{Condition}
+\newtheorem{hypothesis}{Hypothesis}
+
+\newcommand{\xu}[1]{{\color{red} xu: #1}}
+\newcommand{\yuan}[1]{{\color{blue} yuan: #1}}
+
+
+\title{From Transformer to Sliceformer: \\Make Multi-Head Attention as Simple as Sorting}
+
+% Authors must not appear in the submitted version. They should be hidden
+% as long as the \iclrfinalcopy macro remains commented out below.
+% Non-anonymous submissions will be rejected without review.
+
+\author{Shen Yuan$^{1*}$\quad Hongteng Xu$^{1,2}$\thanks{The two authors have equal contributions. Hongteng Xu is the corresponding author.} \\
+$^1$Gaoling School of Artificial Intelligence, Renmin University of China\\
+$^2$Beijing Key Laboratory of Big Data Management and Analysis Methods\\
+\texttt{shenyuan@ruc.edu.cn}\quad \texttt{hongtengxu@ruc.edu.cn}\\
+}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+%\iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+As one of the most popular neural network modules, Transformer plays a central role in many fundamental deep learning models, e.g., the ViT in computer vision and the BERT and GPT in natural language processing.
+Although without strict theoretical supports, the effectiveness of the Transformer is often attributed to its multi-head attention (MHA) mechanism. 
+In this study, we challenge this empirical opinion, abandoning the current MHA mechanism and proposing an effective and efficient surrogate of the Transformer, called Sliceformer, for discriminative tasks. 
+In particular, we discuss the limitations of the MHA mechanism, including the poor scalability and numerical instability caused by its softmax operation and the limited flexibility caused by the multi-head structure. 
+To resolve these issues, our Sliceformer replaces the MHA mechanism with an extremely simple ``slicing-sorting'' operation, i.e., projecting inputs linearly to a latent space and sorting them along different feature dimensions. 
+We analyze the connections and differences between the proposed operation and the MHA mechanism and demonstrate the advantages of the corresponding Sliceformer on computational complexity, scalability, and numerical stability.
+Experiments in the Long-Range Arena (LRA) benchmark and the ImageNet task show that our Sliceformer achieves comparable or better accuracy with fewer parameters, lower memory cost, and faster speed compared to the Transformer and its variants. 
+\end{abstract}
+
+
+\input{sections-arxiv/intro}
+
+\input{sections-arxiv/related}
+
+\input{sections-arxiv/method}
+
+\input{sections-arxiv/exp}
+
+
+\section{Conclusion}
+
+\bibliographystyle{ieee}
+\bibliography{refs}
+
+\input{sections-arxiv/appendix}
+
+\end{document}

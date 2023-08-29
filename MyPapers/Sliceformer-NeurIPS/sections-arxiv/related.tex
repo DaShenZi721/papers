@@ -1,0 +1,34 @@
+\section{Related work and preliminaries}\label{sec:related}
+\subsection{Transformer and Its Applications}
+Initially, Transformer~\cite{vaswani2017attention} is proposed to overcome the scalability issue of recurrent neural networks, leading to a powerful sequential model more friendly to parallel computing and achieving encouraging performance in various natural language processing (NLP) tasks. 
+Since it was proposed, Transformer has become the critical module of many large language models, e.g., BERT~\cite{devlin2019bert}, Transformer-XL~\cite{dai2019transformer}, and GPT~\cite{brown2020language}. 
+Besides the achievements in NLP, Transformer is also applied to deal with other sequential modeling problems, e.g., the Music Transformer~\cite{huang2018music} for music modeling, the Informer~\cite{zhang2021informer} for time series broadcasting, the Transformer Hawkes process~\cite{zuo2020transformer} for event sequence prediction, and the online decision~\cite{zheng2022online} for decision process modeling. 
+
+Moreover, for those non-sequential data, Transformer has also shown its potential.
+In the field of computer vision, the early attempt is made by the Image Transformer~\cite{parmar2018image} for image representation learning. 
+Following this work, the Vision Transformer (ViT) takes the patches of images as a sequence and extracts the image representations accordingly, which outperforms traditional convolutional neural networks (CNNs) in image classification tasks~\cite{dosovitskiy2021an}.
+Since then, many variants of ViT have been proposed, e.g., the Swin ViT in~\cite{liu2021swin} and the Visformer in~\cite{chen2021visformer}. 
+Recently, beyond image representation, the Video Vision Transformer (ViViT)~\cite{arnab2021vivit} and its variants~\cite{liu2022video} are proposed to represent videos.
+Nowadays, Transformer is being introduced for structured data modeling, e.g., the Graphormer~\cite{ying2021transformers} for molecules, the MSA Transformer~\cite{rao2021msa} for proteins, the Set-Transformer~\cite{lee2019set} and Point-Transformer~\cite{zhao2021point} for point clouds, and the Mesh Transformer~\cite{lin2021mesh} for 3D meshes. 
+\textbf{The more applications the Transformer-based models have, the more significant it is to study the Transformer architecture, especially its multi-head attention mechanism.}
+
+
+\subsection{Variants of Transformer}
+As aforementioned, the power of the Transformer is empirically attributed to its multi-head attention mechanism. 
+However, with increased data size/length, computing multiple dense attention maps based on the softmax operation leads to high computational complexity, poor scalability, and numerical instability. 
+As shown in Table~\ref{tab:cmp}, deriving sparse attention maps is a straightforward idea to overcome these issues. 
+Following this idea, the SparseTrans in~\cite{child2019generating} and the Longformer in~\cite{beltagy2020longformer} apply sliding windows to sequences and compute local attention maps based on the sub-sequences in the windows, which leads to sparse attention maps.
+Some other models sparsify the key and query matrices directly by different methods, e.g., the locality-sensitive hashing (LSH) in Reformer~\cite{kitaev2020reformer} and the ReLU operation in CosFormer~\cite{zhen2022cosformer}. 
+Besides pursuing sparse attention maps, another technical route is constructing low-rank attention maps. 
+For example, both the Performer~\cite{choromanski2021rethinking} and the Nystr{\"o}mformer~\cite{xiong2021nystromformer} reduce the feature dimension (the column number) of the query and key matrices, while the Linformer~\cite{wang2020linformer} reduces the sample dimension (the row number) of the key and value matrix. 
+For these models, their attention maps are computed implicitly.
+
+In addition to simplifying the computation of the attention maps, some work attempts to support the rationality of the attention mechanism. 
+One potential interpretation is treating the attention map as a normalized linear kernel.
+Therefore, the attention map can be extended and implemented based on other kernels. 
+The work in~\cite{tsai2019transformer} reimplemented the vanilla Transformer through different kernels and systematically analyzed the kernels' influences.
+The Performer~\cite{choromanski2021rethinking} and the CosFormer~\cite{zhen2022cosformer} introduce additional mapping functions for the query and key matrices and consider their linear kernels in the latent spaces.
+Recently, the work~\cite{sander2022sinkformers} reports an interesting phenomenon that the attention map tends to be doubly stochastic during training. 
+Therefore, implementing the attention map through the Sinkhorn-Knopp algorithm~\cite{sinkhorn1967concerning} leads to the Sinkformer~\cite{sander2022sinkformers}. 
+Note that the above Transformer variants only change the implementation of the attention maps while preserving the multi-head architecture. 
+
